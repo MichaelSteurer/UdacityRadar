@@ -10,11 +10,23 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %speed of light = 3e8
+
+frequencyOfOperation = 77e9;
+maxRange = 200;
+rangeResolution = 1;
+maxVelocity = 100;
+
+c = 3*10^8;
+
 %% User Defined Range and Velocity of target
 % *%TODO* :
 % define the target's initial position and velocity. Note : Velocity
 % remains contant
  
+% velocity between -70 m/s and +70 m/s
+% distance between 0 and maxRange
+targetInitialDistance = 100; 
+targetInitialVelocity = 27; % m/s
 
 
 %% FMCW Waveform Generation
@@ -24,6 +36,19 @@ clc;
 % Calculate the Bandwidth (B), Chirp Time (Tchirp) and Slope (slope) of the FMCW
 % chirp using the requirements above.
 
+bSweepHz = c / 2 * rangeResolution;
+bSweepMHz = bSweepHz / 10^6;
+
+disp("bSweepHz: " + bSweepHz + " Hz");
+
+Tchirp = 5.5 * 2 * (maxRange / c);
+TchirpMicro = Tchirp * 10^6;
+
+disp("TChirp: " + TchirpMicro + " microseconds");
+
+slope = bSweepHz / Tchirp;
+
+disp("slope: " + slope/10e9 + " GHz/s");
 
 %Operating carrier frequency of Radar 
 fc= 77e9;             %carrier freq
@@ -60,18 +85,24 @@ for i=1:length(t)
     % *%TODO* :
     %For each time stamp update the Range of the Target for constant velocity. 
     
+    rangeOfTarget = targetInitialDistance + t(i)*targetInitialVelocity;
+
     % *%TODO* :
     %For each time sample we need update the transmitted and
     %received signal. 
-    Tx(i) = 
-    Rx (i)  =
+
+    % Tx(i) = cos(2 * PI * (fc * t + alpha * t^2 / 2))
+    Tx(i) = cos(2 * pi * (fc * t(i) + slope * t(i)^2 / 2));
+
+    % Rx (i) = cos(2 * pi * (fc * (t-tau) + alpha * (t-tau)^2 / 2 ))
+    tau = rangeOfTarget * 2 /c;
+    Rx(i) = cos(2 * pi * (fc * (t(i) - tau) + slope * (t(i) - tau)^2 / 2 ));
     
     % *%TODO* :
     %Now by mixing the Transmit and Receive generate the beat signal
     %This is done by element wise matrix multiplication of Transmit and
     %Receiver Signal
-    Mix(i) = 
-    
+    Mix(i) = Tx(i) .* Rx(i);
 end
 
 %% RANGE MEASUREMENT
@@ -81,17 +112,24 @@ end
 %reshape the vector into Nr*Nd array. Nr and Nd here would also define the size of
 %Range and Doppler FFT respectively.
 
+signal = reshape(Mix, [Nr Nd]);
+
  % *%TODO* :
 %run the FFT on the beat signal along the range bins dimension (Nr) and
 %normalize.
 
+signalFFT = fft(signal);
+
  % *%TODO* :
 % Take the absolute value of FFT output
+
+signalFFT = abs(signalFFT / Nr);
 
  % *%TODO* :
 % Output of FFT is double sided signal, but we are interested in only one side of the spectrum.
 % Hence we throw out half of the samples.
 
+signalFFT = signalFFT(1:Nr/2+1);
 
 %plotting the range
 figure ('Name','Range from First FFT')
@@ -99,8 +137,8 @@ subplot(2,1,1)
 
  % *%TODO* :
  % plot FFT output 
+plot(signalFFT)
 
- 
 axis ([0 200 0 1]);
 
 
