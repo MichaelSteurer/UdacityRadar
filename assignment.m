@@ -96,8 +96,7 @@ signalFFT = signalFFT(1:Nr/2+1);
 
 %plotting the range
 figure ('Name','Range from First FFT')
-subplot(2,1,1)
-
+subplot(1,1,1)
 plot(signalFFT)
 
 axis ([0 200 0 1]);
