@@ -179,16 +179,23 @@ figure,surf(doppler_axis,range_axis,RDM);
 % *%TODO* :
 %Select the number of Training Cells in both the dimensions.
 
+Tr = 10;
+Td = 8;
+
 % *%TODO* :
 %Select the number of Guard Cells in both dimensions around the Cell under 
 %test (CUT) for accurate estimation
 
+Gr = 4;
+Gd = 4;
+
 % *%TODO* :
 % offset the threshold by SNR value in dB
 
+offset = 6;
+
 % *%TODO* :
 %Create a vector to store noise_level for each iteration on training cells
-noise_level = zeros(1,1);
 
 
 % *%TODO* :
@@ -206,8 +213,32 @@ noise_level = zeros(1,1);
    % Use RDM[x,y] as the matrix from the output of 2D FFT for implementing
    % CFAR
 
+thresholdBlock = zeros(size(RDM));
 
+max_T = 1;
+for i = (Tr + Gr) + 1 : Nr/2 - (Gr + Tr)
+    for j = (Td + Gd) + 1 : Nd - (Gd + Td)
+        noise_level = 0;
 
+        for p = i - (Tr + Gr) : i + (Tr + Gr)
+            for q = j - (Td + Gd) : j + (Td + Gd)
+                if (abs(i-p) > Gr || abs(j-q) > Gd)
+                    noise_level = noise_level + db2pow(RDM(p, q));
+                end
+            end
+        end
+
+        threshold = pow2db(noise_level / (2 * (Td + Gd + 1) * 2 * (Tr + Gr + 1) - (Gr * Gd) - 1));
+        threshold = threshold + offset;
+        
+        CUT = RDM(i, j);
+        if(CUT < threshold)
+            thresholdBlock(i, j) = 0;
+        else
+            thresholdBlock(i, j) = max_T;
+        end
+    end
+end
 
 
 % *%TODO* :
@@ -227,7 +258,7 @@ noise_level = zeros(1,1);
 % *%TODO* :
 %display the CFAR output using the Surf function like we did for Range
 %Doppler Response output.
-figure,surf(doppler_axis,range_axis,'replace this with output');
+figure,surf(doppler_axis, range_axis, thresholdBlock);
 colorbar;
 
 
