@@ -9,11 +9,13 @@ The wave form is computed as described in the course:
 
 ```matlab
 ...
+
 bSweepHz = c / 2 * rangeResolution;
 
 Tchirp = 5.5 * 2 * (maxRange / c);
 
 slope = bSweepHz / Tchirp;
+
 ...
 ```
 
@@ -27,6 +29,8 @@ The full implementation can be found in the [Github file](https://github.com/Mic
 The beat signal (_Mix(i)_) is computed by element-wise multiplication of the transmitted signal and the received signal:
 
 ```matlab
+...
+
 for i=1:length(t)             
     rangeOfTarget = targetInitialDistance + t(i)*targetInitialVelocity;
 
@@ -39,6 +43,8 @@ for i=1:length(t)
     
     Mix(i) = Tx(i) .* Rx(i);
 end
+
+...
 ```
 
 The full implementation can be found in the [Github file](https://github.com/MichaelSteurer/UdacityRadar/blob/master/assignment.m#L74).
@@ -49,10 +55,14 @@ The full implementation can be found in the [Github file](https://github.com/Mic
 The beat signal is now transferred from the time-domain into the frequency domain using the _fft(.)_ function. We use the normalised output, get the absolute values and remove the left side (negative frequencies) as it is just a mirrored image of the positive frequencies.
 
 ```matlab
+...
+
 signal = reshape(Mix, [Nr Nd]);
 signalFFT = fft(signal);
 signalFFT = abs(signalFFT / Nr);
 signalFFT = signalFFT(1:Nr/2+1);
+
+...
 ```
 
 <img src="static/fft.jpg" width="820" height="248" />
@@ -81,6 +91,7 @@ To reduce the noise in the RDM and highlight the peak we implement a simple CFAR
 The code is similar to what we saw in video of the project description:
 
 ```matlab
+...
 
 % output matrix with size of RDM with zeros
 % this is necessary as we do not process the edge cells in the next loop
@@ -112,6 +123,8 @@ for i = (Tr + Gr) + 1 : Nr/2 - (Gr + Tr)
         end
     end
 end
+
+...
 ```
 
 Eventually we plot the values stored in th _thresholdBlock_. The cell sizes for training and guard cells used to create the plot are as follows: `Tr=10` and `Td=8` respectively `Gr=4` and `Gd=4`. The offset was selected as `offset=6`.
