@@ -40,7 +40,7 @@ disp("TChirp: " + TchirpMicro + " microseconds");
 
 slope = bSweepHz / Tchirp;
 
-disp("slope: " + slope/10e9 + " GHz/s");
+disp("slope: " + slope/10^9 + " GHz/s");
 
 %Operating carrier frequency of Radar 
 fc= 77e9;             %carrier freq
