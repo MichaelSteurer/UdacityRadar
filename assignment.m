@@ -136,13 +136,13 @@ figure,surf(doppler_axis,range_axis,RDM);
 
 %Slide Window through the complete Range Doppler Map
 
-Tr = 10;
-Td = 8;
+Tr = 8;
+Td = 6;
 
 Gr = 4;
 Gd = 4;
 
-offset = 6;
+offset = 10;
 
 thresholdBlock = zeros(size(RDM));
 

@@ -127,7 +127,7 @@ end
 ...
 ```
 
-Eventually we plot the values stored in th _thresholdBlock_. The cell sizes for training and guard cells used to create the plot are as follows: `Tr=10` and `Td=8` respectively `Gr=4` and `Gd=4`. The offset was selected as `offset=6`.
+Eventually we plot the values stored in th _thresholdBlock_. The cell sizes for training and guard cells used to create the plot are as follows: `Tr=8` and `Td=6` respectively `Gr=4` and `Gd=4`. The offset was selected as `offset=10`.
 
 
 <img src="static/result.jpg" width="820" height="248" />
